@@ -58,7 +58,9 @@ class IrisDatasetGenerator():
         train_data, inference_data = train_test_split(iris_full_df, test_size=test_size, random_state=random_state)
         self.df_train = train_data
         self.df_inference = inference_data.drop(columns=['target'])
-        logger.info(f"Splitting iris data ...")   
+        logger.info(f"Splitting iris data ...")
+        logger.info(f"Creating train dataset with {len(train_data)} samples...")   
+        logger.info(f"Creating inference dataset with {len(inference_data)} samples...")   
 
     def save_datasets(self, train_filepath, inference_filepath):
         # Save train and inference datasets to CSV files
