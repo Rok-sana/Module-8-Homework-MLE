@@ -8,9 +8,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_iris
 import numpy as np
 
-# Static variables
-RANDOM_STATE = 42
-
 # Create logger
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -53,7 +50,7 @@ class IrisDatasetGenerator():
         logger.info(f"Loading iris data ...")   
         return iris_full_df
     
-    def split_data(self, iris_full_df, test_size=0.2, random_state=RANDOM_STATE):
+    def split_data(self, iris_full_df, test_size=0.2, random_state=conf['general']['random_state']):
         # Split the data into train and test sets
         train_data, inference_data = train_test_split(iris_full_df, test_size=test_size, random_state=random_state)
         self.df_train = train_data
@@ -75,6 +72,6 @@ if __name__ == "__main__":
     logger.info("Starting script...")
     iris_dataset_generator = IrisDatasetGenerator()
     iris_full_df = iris_dataset_generator.load_data()
-    iris_dataset_generator.split_data(iris_full_df, test_size=0.2, random_state=42)
+    iris_dataset_generator.split_data(iris_full_df, test_size=0.2, random_state=conf['general']['random_state'])
     iris_dataset_generator.save_datasets(TRAIN_PATH, INFERENCE_PATH)
     logger.info("Script completed successfully.")

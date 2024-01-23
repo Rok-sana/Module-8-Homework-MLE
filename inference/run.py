@@ -6,21 +6,23 @@ Imports necessary packages and modules.
 import argparse
 import json
 import logging
-import os
 import pickle
+import os
 import sys
 from datetime import datetime
 from typing import List
-
+import tensorflow as tf
+import numpy as np
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
+
 
 # Adds the root directory to system path
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(ROOT_DIR))
 
 # Change to CONF_FILE = "settings.json" if you have problems with env variables
-CONF_FILE = os.getenv('CONF_PATH')
+#CONF_FILE = os.getenv('CONF_PATH')
+CONF_FILE = "settings.json"
 
 from utils import get_project_dir, configure_logging
 
@@ -43,23 +45,25 @@ parser.add_argument("--out_path",
 
 
 def get_latest_model_path() -> str:
-    """Gets the path of the latest saved model"""
-    latest = None
-    for (dirpath, dirnames, filenames) in os.walk(MODEL_DIR):
-        for filename in filenames:
-            if not latest or datetime.strptime(latest, conf['general']['datetime_format'] + '.pickle') < \
-                    datetime.strptime(filename, conf['general']['datetime_format'] + '.pickle'):
-                latest = filename
-    return os.path.join(MODEL_DIR, latest)
+    """Gets the path of the latest saved model """
+    latest_model_path = None
+    latest_mtime = None
+    for filename in os.listdir(MODEL_DIR):
+        if filename.endswith(".keras"):  # used keras format
+            model_path = os.path.join(MODEL_DIR, filename)
+            model_mtime = os.path.getmtime(model_path)
+            if not latest_mtime or model_mtime > latest_mtime:
+                latest_model_path = model_path
+                latest_mtime = model_mtime
+    return latest_model_path
 
 
-def get_model_by_path(path: str) -> DecisionTreeClassifier:
-    """Loads and returns the specified model"""
+def get_model_by_path(path: str) -> tf.keras.Model:
+    """Loads and returns the tensorFlow model"""
     try:
-        with open(path, 'rb') as f:
-            model = pickle.load(f)
-            logging.info(f'Path of the model: {path}')
-            return model
+        model = tf.keras.models.load_model(path)  # Load model directly
+        logging.info(f'Path of the model: {path}')
+        return model
     except Exception as e:
         logging.error(f'An error occurred while loading the model: {e}')
         sys.exit(1)
@@ -75,10 +79,10 @@ def get_inference_data(path: str) -> pd.DataFrame:
         sys.exit(1)
 
 
-def predict_results(model: DecisionTreeClassifier, infer_data: pd.DataFrame) -> pd.DataFrame:
-    """Predict de results and join it with the infer_data"""
-    results = model.predict(infer_data)
-    infer_data['results'] = results
+def predict_results(model: tf.keras.Model, infer_data: pd.DataFrame) -> pd.DataFrame:
+    """Predict results and join them with the infer_data."""
+    results = model.predict(infer_data)  
+    infer_data['results'] = np.argmax(results, axis=1)
     return infer_data
 
 

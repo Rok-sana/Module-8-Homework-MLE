@@ -9,7 +9,9 @@ ENV CONF_PATH=${settings_name}
 # Changing the path to the working directory in the container
 WORKDIR /app
 
+
 # Copy data folder to Docker
+COPY data_process /app/data_process
 COPY data/ /app/data
 
 # Copy the code itself
@@ -24,4 +26,5 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Train the model
+RUN python3 data_process/data_generation.py
 RUN python3 training/train.py
