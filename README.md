@@ -40,7 +40,7 @@ Module-8-Homework-MLE
 Please create a .env file or manually initializing an environment variable as `CONF_PATH=settings.json`.
 
 
-## Data, Training,  Inference:
+# Data, Training,  Inference:
 For convenient use of the project was added `run_ml_pipeline.sh` script that is responsible for data generation, model training and testing, as well as checking on the inference data.
 
 To execute this script, you would typically open a terminal, navigate to the directory containing the script, and then run the following command:
@@ -65,9 +65,9 @@ build_and_run_docker(): A function that builds and runs a Docker container based
 - Create Directories:
 Calls create_directory twice to ensure that the "data" and "models" directories exist. If they don't, the script creates them.
 
-Build and Run Training Docker Container:
+- Build and Run Training Docker Container:
 Calls build_and_run_docker to build and run a Docker container for training the ML model. It specifies the Dockerfile, image name, and settings for the build.
 
-- Build and Run Inference Docker Container:
+- Build and Run Inference Docker Container and create result data:
 Calls build_and_run_docker again, this time for the inference phase. It uses a different Dockerfile, sets a unique image name, and specifies both the settings and a sample model name ("sample_model.keras") as build arguments.
 
