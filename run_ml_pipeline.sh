@@ -28,4 +28,7 @@ create_directory "models"
 build_and_run_docker "./training/Dockerfile" "training_image" "settings.json" ""
 
 # Build and run inference Docker container
-build_and_run_docker "./inference/Dockerfile" "inference_image" "settings.json" "sample_model.keras"
+docker build -f ./inference/Dockerfile --build-arg model_name=tensorflow_model.keras --build-arg settings_name=settings.json -t inference_image .
+container_id=$(docker run -d inference_image)
+docker wait $container_id
+docker cp $container_id:/app/results .
